@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日祝福</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #8a2a61;
+        }
+        
+        /* 页面通用样式 */
+        .page {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            padding: 20px;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* 蛋糕页面 */
+        #cake-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cake-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 30px auto;
+        }
+        
+        .cake {
+            position: relative;
+            width: 220px;
+            height: 120px;
+            background: #fff;
+            border-radius: 50% 50% 0 0;
+            margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .cake-base {
+            position: absolute;
+            width: 260px;
+            height: 60px;
+            background: #f8c8dc;
+            border-radius: 50%;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .candle {
+            position: absolute;
+            width: 12px;
+            height: 50px;
+            background: #fff;
+            border-radius: 5px;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+        }
+        
+        .flame {
+            position: absolute;
+            width: 18px;
+            height: 35px;
+            background: #ffcc00;
+            border-radius: 50% 50% 20% 20%;
+            top: -90px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px 10px rgba(255, 204, 0, 0.7);
+            animation: flicker 0.8s infinite alternate;
+            z-index: 5;
+        }
+        
+        .flame.extinguished {
+            animation: extinguish 0.5s forwards;
+        }
+        
+        .instruction {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #8a2a61;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        
+        /* 图片轮播页面 */
+        #photo-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .photo-container {
+            width: 100%;
+            max-width: 700px;
+            height: 450px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .photo-slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .photo-slide.active {
+            opacity: 1;
+        }
+        
+        .photo-counter {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #8a2a61;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+        }
+        
+        /* 祝福页面 */
+        #wish-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wish-container {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            border: 8px solid #ff9a9e;
+        }
+        
+        .wish-title {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #d63384;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .wish-content {
+            font-size: 22px;
+            line-height: 1.8;
+            text-align: left;
+            color: #8a2a61;
+        }
+        
+        .heart {
+            color: #ff4d8d;
+            margin: 0 5px;
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        .signature {
+            text-align: right;
+            margin-top: 40px;
+            font-size: 24px;
+            font-style: italic;
+            color: #d63384;
+            font-weight: bold;
+        }
+        
+        /* 音乐控制 */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .music-control i {
+            font-size: 24px;
+            color: #d63384;
+        }
+        
+        /* 开始按钮 */
+        .start-btn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ff4d8d, #ff9a9e);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* 装饰元素 */
+        .decoratio
