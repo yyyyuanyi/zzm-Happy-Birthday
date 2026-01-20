@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>生日快乐 — 粉彩祝福</title>
+  <style>
+  :root{--bg:#fff0f6;--soft:#ffe6f0;--pink:#ffb6d5;--text:#6b3450}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:linear-gradient(180deg,var(--bg),#fff);color:var(--text);display:flex;align-items:center;justify-content:center;padding:12px}
+  .card{width:380px;height:720px;border-radius:18px;background:linear-gradient(180deg,var(--soft),#fff);box-shadow:0 16px 40px rgba(107,52,80,0.12);position:relative;overflow:hidden}
+  .top-deco{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle at 12% 12%, rgba(255,182,213,0.12), transparent 6%)}
+  .cat{position:absolute;left:16px;top:12px;width:64px;height:64px}
+  .stage{position:absolute;left:0;right:0;top:64px;bottom:160px;display:flex;align-items:center;justify-content:center}
+  .cake{position:relative;width:260px;height:200px;display:flex;flex-direction:column;align-items:center}
+  .cake-bottom{width:240px;height:120px;background:#ffd1e6;border-radius:20px 20px 14px 14px;box-shadow:inset 0 -10px 12px rgba(255,255,255,0.3)}
+  .cake-top{position:relative;top:-40px;width:220px;height:68px;background:#fff;border-radius:34px;box-shadow:inset 0 -6px 10px rgba(255,0,120,0.04)}
+  .candle{position:absolute;left:50%;top:-20px;transform:translateX(-50%);width:22px;height:56px;background:linear-gradient(#fff,#ffd4e6);border-radius:8px;display:flex;align-items:flex-start;justify-content:center;cursor:pointer}
+  .candle:active{transform:translateX(-50%) scale(.98)}
+  .flame{width:16px;height:20px;margin-top:-10px;border-radius:50%;background:linear-gradient(#ffd36a,#ff6b6b);opacity:0;transform:translateY(8px) scale(.6);transition:all .35s}
+  .hint{position:absolute;bottom:140px;width:100%;text-align:center;font-weight:700;color:#b14b6a}
+  .start-overlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:auto}
+  .start-btn{background:linear-gradient(135deg,#ff84b6,#ffb6d5);padding:12px 20px;border-radius:999px;color:white;font-weight:800;box-shadow:0 8px 22px rgba(203,81,122,0.14);cursor:pointer}
+  .art-text{position:absolute;bottom:160px;width:100%;text-align:center;font-size:34px;color:#ff4d88;font-weight:900;letter-spacing:2px;opacity:0;transform:translateY(8px) scale(.95);transition:all .6s}
+  .art-text.show{opacity:1;transform:translateY(0) scale(1)}
+  .slideshow{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .photo-popup{position:absolute;width:86%;height:60%;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 22px 60px rgba(107,52,80,0.18);
+    /* 新增/修改：优化过渡效果，实现淡入淡出 */
+    opacity:0;
+    transform:translateY(10px) scale(.96);
+    transition:all 0.8s ease; /* 延长过渡时间，更平滑 */
+  }
+  .photo-popup.show{opacity:1;transform:translateY(0) scale(1)}
+  .photo-popup img{width:100%;height:100%;object-fit:cover;border-radius:12px;
+    /* 图片自身也加淡入过渡 */
+    transition:opacity 0.8s ease;
+  }
+  .wish{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,240,248,0.95),rgba(255,250,250,0.98));opacity:0;pointer-events:none;transition:opacity .45s}
+  .wish.show{opacity:1;pointer-events:auto}
+  .wish-card{background:linear-gradient(180deg,#fff,#ffeef6);padding:22px;border-radius:16px;box-shadow:0 10px 30px rgba(203,81,122,0.12);text-align:center}
+  .wish-card h1{margin:0;color:#ff4d88}
+  .btn{margin-top:12px;padding:8px 14px;border-radius:10px;border:none;background:var(--pink);color:white}
+  .footer{position:absolute;left:0;right:0;bottom:18px;text-align:center;color:#b14b6a;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="top-deco"></div>
+    <svg class="cat" viewBox="0 0 64 64" aria-hidden>
+      <circle cx="32" cy="32" r="28" fill="#fff" stroke="#ff8fb3" stroke-width="2" />
+      <circle cx="22" cy="28" r="3" fill="#6b3450"/>
+      <circle cx="42" cy="28" r="3" fill="#6b3450"/>
+      <path d="M46 12c0 6-8 6-8 0 0-3 4-6 8-6 0 2 0 3 0 6z" fill="#ff7aa2"/>
+    </svg>
+
+    <div class="stage" id="stage">
+      <div id="cake" class="cake" aria-label="生日蛋糕">
+        <div class="cake-bottom"></div>
+        <div class="cake-top">
+          <div class="candle" id="candle" role="button" tabindex="0">
+            <div class="flame" id="flame"></div>
+          </div>
+        </div>
+      </div>
+      <div id="art" class="art-text">生日快乐</div>
+      <div id="photoLayer" class="slideshow"></div>
+    </div>
+
+    <div id="wish" class="wish" role="dialog">
+      <div class="wish-card">
+        <h1>祝你生日快乐 🎉</h1>
+        <p id="wish-text">笑颜胜春阳，步履带花香。愿年年今朝，与光同在你身旁。</p>
+        <button id="replay" class="btn">再看一次</button>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">轻触蛋糕点燃蜡烛</div>
+
+    <div class="start-overlay" id="startOverlay">
+      <div class="start-btn" id="startBtn">点我为你庆生</div>
+    </div>
+
+    <audio id="birthdayAudio" src="生日快乐歌.mp3" loop preload="auto"></audio>
+    <div class="footer">张曾媚生日快乐</div>
+  </div>
+
+  <script>
+  (function(){
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const candle = document.getElementById('candle');
+    const flame = document.getElementById('flame');
+    const hint = document.getElementById('hint');
+    const art = document.getElementById('art');
+    const photoLayer = document.getElementById('photoLayer');
+    const wish = document.getElementById('wish');
+    const replay = document.getElementById('replay');
+
+    // placeholder photos (SVG data URLs) — replace with real images if desired
+    const photos = ['photo1.jpg','photo2.jpg','photo3.jpg','photo4.jpg','photo5.jpg','photo6.jpg','photo7.jpg','photo8.jpg'];
+
+    let audioCtx=null, musicStarted=false, photoTimer=null, photoIndex=0, musicIntervalId=null;
+
+    function ensureAudio() {
+      // 无需创建 AudioContext，改用 audio 元素
+    }
+
+    function startMusicLoop() {
+      if (musicStarted) return;
+      musicStarted = true;
+      const audio = document.getElementById('birthdayAudio');
+      audio.play().catch(err => {
+          console.log('播放失败：', err);
+       // 兼容移动端需要用户交互后播放的限制
+      });
+    }
+
+    // 合并重复的replay事件，修复逻辑
+    replay.addEventListener('click', ()=>{
+       wish.classList.remove('show'); 
+       art.classList.remove('show'); 
+       photoLayer.innerHTML=''; 
+       flame.style.opacity=0; 
+       flame.style.transform='translateY(8px) scale(.6)'; 
+       hint.style.opacity=1; 
+       startOverlay.style.display='flex';
+       if(photoTimer){ clearInterval(photoTimer); photoTimer=null; }
+       // 停止音频并重置
+       const audio = document.getElementById('birthdayAudio');
+       audio.pause();
+       audio.currentTime = 0;
+       musicStarted = false;
+    });
+
+    function revealArt(){ art.classList.add('show'); }
+
+    function showPhotoSequence(){
+      photoIndex=0; 
+      photoLayer.innerHTML=''; 
+      const popup = document.createElement('div'); 
+      popup.className='photo-popup'; 
+      const img=document.createElement('img'); 
+      popup.appendChild(img); 
+      photoLayer.appendChild(popup);
+
+      // 先显示第一张图片
+      img.src = photos[photoIndex];
+      popup.classList.add('show');
+      photoIndex++;
+
+      // 修改定时器：5秒切换一次（5000毫秒）
+      photoTimer = setInterval(()=>{
+        if(photoIndex>=photos.length){ 
+          clearInterval(photoTimer); 
+          photoTimer=null; 
+          // 淡出当前图片后隐藏
+          popup.classList.remove('show'); 
+          setTimeout(()=>{ 
+            photoLayer.innerHTML=''; 
+            showWish(); 
+          },800); // 等待过渡完成（与CSS过渡时间一致）
+          return; 
+        }
+
+        // 先淡出当前图片
+        popup.classList.remove('show');
+        // 等待淡出完成后更换图片并淡入
+        setTimeout(()=>{
+          img.src = photos[photoIndex];
+          popup.classList.add('show');
+          photoIndex++;
+        },800); // 等待过渡完成（与CSS过渡时间一致）
+      },3000); // 每张图片展示5秒
+    }
+
+    function showWish(){ wish.classList.add('show'); }
+
+    function startSequence(){
+      startOverlay.style.display='none'; 
+      flame.style.opacity=1; 
+      flame.style.transform='translateY(0) scale(1)'; 
+      hint.style.opacity=0;
+      ensureAudio(); 
+      if(audioCtx && audioCtx.state==='suspended') audioCtx.resume().then(()=>startMusicLoop()).catch(()=>startMusicLoop()); 
+      else startMusicLoop();
+      setTimeout(revealArt,5000); 
+      setTimeout(showPhotoSequence,10000);
+    }
+
+    // 事件绑定
+    startBtn.addEventListener('click', startSequence);
+    startBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); startSequence(); }, {passive:false});
+    candle.addEventListener('click', ()=>{ if(startOverlay.style.display!=='none') startSequence(); });
+    candle.addEventListener('touchstart', (e)=>{ e.preventDefault(); if(startOverlay.style.display!=='none') startSequence(); }, {passive:false});
+
+    // keyboard accessibility
+    candle.addEventListener('keypress', (e)=>{ if(e.key==='Enter' || e.key===' ') startSequence(); });
+  })();
+  </script>
+</body>
+</html>
